@@ -15,29 +15,41 @@
 ## 📦 Installation
 
 ### 1️⃣ Clone the Repository
-```git clone https://github.com/yourusername/nomadnotes.git  
-cd nomadnotes```
+```
+git clone https://github.com/yourusername/nomadnotes.git  
+cd nomadnotes
+```
 
 ### 2️⃣ Install Dependencies
 Ensure you have Rust installed. If not, install it via rustup.
 
-```cargo install --path .```
+```
+cargo install --path .
+```
 
 ---
 
 ## ⚡ Usage
 
 ### Create a New Note
-```nomadnotes new "My First Note" "This is the content" --tags rust,cli```
+```
+nomadnotes new "My First Note" "This is the content" --tags rust,cli
+```
 
 ### List All Notes
-```nomadnotes list```
+```
+nomadnotes list
+```
 
 ### View a Note
-```nomadnotes view "My First Note"```
+```
+nomadnotes view "My First Note"
+```
 
 ### Delete a Note
-```nomadnotes delete "My First Note"```
+```
+nomadnotes delete "My First Note"
+```
 
 ---
 
