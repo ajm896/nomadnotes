@@ -1,5 +1,7 @@
+use std::fmt::Display;
+
 use clap::{Parser, Subcommand};
-use rusqlite::{Connection, MappedRows, Result};
+use rusqlite::{Connection, Result};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -29,9 +31,14 @@ struct Note {
     tags: Vec<String>,
     content: String,
 }
+impl Display for Note {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Title: {}\n\n{}", self.title, self.content)
+    }
+}
 fn main() -> Result<()> {
-    let connection = init_db()?;
-    let cli = Cli::parse();
+    let connection: Connection = init_db()?;
+    let cli: Cli = Cli::parse();
 
     match &cli.command {
         Commands::New {
@@ -49,7 +56,10 @@ fn main() -> Result<()> {
         Commands::List {} => {
             print_table(&connection);
         }
-        Commands::View { title } => {}
+        Commands::View { title } => {
+            let note = retrive_note(&connection, title);
+            println!("{}", note);
+        }
         Commands::Delete { title } => {
             delete_note(&connection, title);
         }
@@ -82,22 +92,9 @@ fn insert_note(connection: &Connection, note: Note) -> Result<usize, rusqlite::E
 
 fn print_table(connection: &Connection) {
     let mut stmt = connection.prepare("SELECT * FROM notes;").unwrap();
-    let notes = stmt
-        .query_map([], |row| {
-            // Ok(Note {
-            //     title: row.get(1)?,
-            //     content: row.get(2)?,
-            //     tags: row
-            //         .get::<_, String>(3)?
-            //         .split(",")
-            //         .map(|s| s.to_string())
-            //         .collect(),
-            // })
-            parse_note(row)
-        })
-        .unwrap();
+    let notes = stmt.query_map([], |row| parse_note(row)).unwrap();
     for note in notes {
-        println!("{:?}", note.unwrap());
+        println!("{}", note.unwrap());
     }
 }
 
@@ -118,4 +115,11 @@ fn parse_note(note: &rusqlite::Row) -> Result<Note> {
             .map(|s| s.to_string())
             .collect(),
     })
+}
+
+fn retrive_note(connection: &Connection, title: &String) -> Note {
+    let sql = "SELECT * FROM notes WHERE title = ?1;";
+    let mut query = connection.prepare(sql).unwrap();
+    let mut notes = query.query_map([title], |n| parse_note(n)).unwrap();
+    notes.next().unwrap().unwrap()
 }
