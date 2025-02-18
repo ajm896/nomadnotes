@@ -97,7 +97,7 @@ fn insert_note(connection: &Connection, note: Note) -> Result<usize, rusqlite::E
     )
 }
 
-fn print_table(connection: &Connection) {
+fn print_table(connection: &Connection) -> Result<(), rusqlite::Error> {
     let sql = "SELECT * FROM notes;";
 
     let mut stmt = match connection.prepare(sql) {
@@ -111,9 +111,10 @@ fn print_table(connection: &Connection) {
     };
 
     for note in notes {
-        println!("{}", note.unwrap());
+        println!("{}", note?);
         println!("--------------------")
     }
+    Ok(())
 }
 
 fn delete_note(connection: &Connection, title: &String) {
@@ -125,11 +126,10 @@ fn delete_note(connection: &Connection, title: &String) {
 
 fn parse_note(note: &rusqlite::Row) -> Result<Note> {
     Ok(Note {
-        title: note.get(1).unwrap(),
-        content: note.get(2).unwrap(),
+        title: note.get(1)?,
+        content: note.get(2)?,
         tags: note
-            .get::<_, String>(3)
-            .unwrap()
+            .get::<_, String>(3)?
             .split(",")
             .map(|s| s.to_string())
             .collect(),
