@@ -14,6 +14,7 @@ enum Commands {
     New {
         title: String,
         content: String,
+        #[arg(short, long, num_args= 1.., value_delimiter = ',')]
         tags: Option<Vec<String>>,
     },
     List,
@@ -33,7 +34,11 @@ struct Note {
 }
 impl Display for Note {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Title: {}\n\n{}", self.title, self.content)
+        write!(
+            f,
+            "Title: {}\nTags: {:?}\n\n{}",
+            self.title, self.tags, self.content
+        )
     }
 }
 fn main() -> Result<()> {
@@ -57,8 +62,10 @@ fn main() -> Result<()> {
             print_table(&connection);
         }
         Commands::View { title } => {
-            let note = retrive_note(&connection, title);
-            println!("{}", note);
+            match retrive_note(&connection, title) {
+                Some(note) => println!("{}", note),
+                None => println!("Note not Found"),
+            };
         }
         Commands::Delete { title } => {
             delete_note(&connection, title);
@@ -91,17 +98,29 @@ fn insert_note(connection: &Connection, note: Note) -> Result<usize, rusqlite::E
 }
 
 fn print_table(connection: &Connection) {
-    let mut stmt = connection.prepare("SELECT * FROM notes;").unwrap();
-    let notes = stmt.query_map([], |row| parse_note(row)).unwrap();
+    let sql = "SELECT * FROM notes;";
+
+    let mut stmt = match connection.prepare(sql) {
+        Ok(stmt) => stmt,
+        Err(_) => panic!("Error while preparing statement"),
+    };
+
+    let notes = match stmt.query_map([], |row| parse_note(row)) {
+        Ok(notes) => notes,
+        Err(_) => panic!("Error while fetching notes"),
+    };
+
     for note in notes {
         println!("{}", note.unwrap());
+        println!("--------------------")
     }
 }
 
 fn delete_note(connection: &Connection, title: &String) {
-    connection
-        .execute("DELETE FROM notes WHERE title = ?1", [title])
-        .unwrap();
+    match connection.execute("DELETE FROM notes WHERE title = ?1", [title]) {
+        Ok(_) => println!("Note deleted"),
+        Err(_) => println!("Error while deleting note"),
+    };
 }
 
 fn parse_note(note: &rusqlite::Row) -> Result<Note> {
@@ -117,9 +136,26 @@ fn parse_note(note: &rusqlite::Row) -> Result<Note> {
     })
 }
 
-fn retrive_note(connection: &Connection, title: &String) -> Note {
+fn retrive_note(connection: &Connection, title: &String) -> Option<Note> {
+    // Set up query
     let sql = "SELECT * FROM notes WHERE title = ?1;";
-    let mut query = connection.prepare(sql).unwrap();
-    let mut notes = query.query_map([title], |n| parse_note(n)).unwrap();
-    notes.next().unwrap().unwrap()
+    let mut query = connection.prepare(sql).expect("DB Error");
+
+    // Execute query and map parse to Notes
+    let mut notes = match query.query_map([title], |n| parse_note(n)) {
+        Ok(notes) => notes,
+        Err(_) => panic!("Error while fetching note"),
+    };
+
+    // Get the first note
+    let note = match notes.next() {
+        Some(note) => note,
+        None => panic!("Note not found"),
+    };
+
+    // Return the note
+    match note {
+        Ok(note) => Some(note),
+        Err(_) => None,
+    }
 }
