@@ -59,7 +59,7 @@ fn main() -> Result<()> {
             insert_note(&connection, note)?;
         }
         Commands::List {} => {
-            print_table(&connection);
+            print_table(&connection)?;
         }
         Commands::View { title } => {
             match retrive_note(&connection, title) {
@@ -119,6 +119,7 @@ fn print_table(connection: &Connection) -> Result<(), rusqlite::Error> {
 
 fn delete_note(connection: &Connection, title: &String) {
     match connection.execute("DELETE FROM notes WHERE title = ?1", [title]) {
+        Ok(0) => println!("Note not found"),
         Ok(_) => println!("Note deleted"),
         Err(_) => println!("Error while deleting note"),
     };
@@ -129,7 +130,8 @@ fn parse_note(note: &rusqlite::Row) -> Result<Note> {
         title: note.get(1)?,
         content: note.get(2)?,
         tags: note
-            .get::<_, String>(3)?
+            .get::<_, Option<String>>(3)?
+            .unwrap_or_default()
             .split(",")
             .map(|s| s.to_string())
             .collect(),
@@ -139,23 +141,11 @@ fn parse_note(note: &rusqlite::Row) -> Result<Note> {
 fn retrive_note(connection: &Connection, title: &String) -> Option<Note> {
     // Set up query
     let sql = "SELECT * FROM notes WHERE title = ?1;";
-    let mut query = connection.prepare(sql).expect("DB Error");
+    let mut query = connection.prepare(sql).expect("SQL Error");
 
     // Execute query and map parse to Notes
-    let mut notes = match query.query_map([title], |n| parse_note(n)) {
-        Ok(notes) => notes,
-        Err(_) => panic!("Error while fetching note"),
-    };
+    let mut notes = query.query_map([title], |n| parse_note(n)).ok()?;
 
     // Get the first note
-    let note = match notes.next() {
-        Some(note) => note,
-        None => panic!("Note not found"),
-    };
-
-    // Return the note
-    match note {
-        Ok(note) => Some(note),
-        Err(_) => None,
-    }
+    notes.next()?.ok()
 }
