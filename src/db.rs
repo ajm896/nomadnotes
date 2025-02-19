@@ -32,7 +32,7 @@ pub fn print_table(connection: &Connection) -> Result<(), rusqlite::Error> {
         Err(_) => panic!("Error while preparing statement"),
     };
 
-    let notes = match stmt.query_map([], |row| parse_note(row)) {
+    let notes = match stmt.query_map([], parse_note) {
         Ok(notes) => notes,
         Err(_) => panic!("Error while fetching notes"),
     };
@@ -71,7 +71,7 @@ pub fn retrive_note(connection: &Connection, title: &String) -> Option<Note> {
     let mut query = connection.prepare(sql).expect("SQL Error");
 
     // Execute query and map parse to Notes
-    let mut notes = query.query_map([title], |n| parse_note(n)).ok()?;
+    let mut notes = query.query_map([title], parse_note).ok()?;
 
     // Get the first note
     notes.next()?.ok()
