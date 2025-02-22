@@ -76,7 +76,7 @@ pub fn retrive_note(connection: &Connection, title: &String) -> Option<Note> {
     // Get the first note
     notes.next()?.ok()
 }
-
+#[allow(dead_code)]
 pub fn find_notes_by_tag(connection: &Connection, tag: &str) -> Result<Vec<Note>, rusqlite::Error> {
     let query = "SELECT * FROM notes WHERE tags LIKE ?1";
     let mut stmt = connection.prepare(query)?;
