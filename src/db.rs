@@ -1,6 +1,7 @@
 use super::models::Note;
 use rusqlite::{Connection, Result};
 
+#[allow(dead_code)]
 pub fn init_db() -> Result<Connection> {
     let connection = Connection::open("notes.db")?;
     connection.execute(
@@ -16,6 +17,7 @@ pub fn init_db() -> Result<Connection> {
     )?;
     Ok(connection)
 }
+#[allow(dead_code)]
 
 pub fn insert_note(connection: &Connection, note: Note) -> Result<usize, rusqlite::Error> {
     connection.execute(
@@ -23,6 +25,7 @@ pub fn insert_note(connection: &Connection, note: Note) -> Result<usize, rusqlit
         [note.title, note.content, note.tags.join(",")],
     )
 }
+#[allow(dead_code)]
 
 pub fn print_table(connection: &Connection) -> Result<(), rusqlite::Error> {
     let sql = "SELECT * FROM notes;";
@@ -43,6 +46,7 @@ pub fn print_table(connection: &Connection) -> Result<(), rusqlite::Error> {
     }
     Ok(())
 }
+#[allow(dead_code)]
 
 pub fn delete_note(connection: &Connection, title: &String) {
     match connection.execute("DELETE FROM notes WHERE title = ?1", [title]) {
@@ -51,6 +55,7 @@ pub fn delete_note(connection: &Connection, title: &String) {
         Err(_) => println!("Error while deleting note"),
     };
 }
+#[allow(dead_code)]
 
 pub fn parse_note(note: &rusqlite::Row) -> Result<Note> {
     Ok(Note {
@@ -64,6 +69,7 @@ pub fn parse_note(note: &rusqlite::Row) -> Result<Note> {
             .collect(),
     })
 }
+#[allow(dead_code)]
 
 pub fn retrive_note(connection: &Connection, title: &String) -> Option<Note> {
     // Set up query

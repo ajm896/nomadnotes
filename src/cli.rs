@@ -27,6 +27,7 @@ pub enum Commands {
         content: String,
     },
 }
+#[allow(dead_code)]
 impl Cli {
     pub fn parse() -> Self {
         clap::Parser::parse()

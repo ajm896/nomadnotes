@@ -1,6 +1,7 @@
+use async_graphql::SimpleObject;
 use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Debug, SimpleObject)]
 pub struct Note {
     pub title: String,
     pub tags: Vec<String>,
