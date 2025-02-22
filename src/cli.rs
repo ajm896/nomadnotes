@@ -8,17 +8,23 @@ pub struct Cli {
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     New {
-        title: String,
         content: String,
+        title: Option<String>,
         #[arg(short, long, num_args= 1.., value_delimiter = ',')]
         tags: Option<Vec<String>>,
     },
-    List,
+    List {
+        tags: Option<Vec<String>>,
+    },
     View {
         title: String,
     },
     Delete {
         title: String,
+    },
+    Edit {
+        title: String,
+        content: String,
     },
 }
 impl Cli {

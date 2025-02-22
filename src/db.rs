@@ -76,3 +76,14 @@ pub fn retrive_note(connection: &Connection, title: &String) -> Option<Note> {
     // Get the first note
     notes.next()?.ok()
 }
+
+pub fn find_notes_by_tag(connection: &Connection, tag: &str) -> Result<Vec<Note>, rusqlite::Error> {
+    let query = "SELECT * FROM notes WHERE tags LIKE ?1";
+    let mut stmt = connection.prepare(query)?;
+    let notes = stmt
+        .query_map([format!("%{}%", tag)], |row| parse_note(row))?
+        .filter_map(Result::ok)
+        .collect();
+
+    Ok(notes)
+}

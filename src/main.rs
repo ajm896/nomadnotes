@@ -19,15 +19,30 @@ fn main() -> Result<()> {
             content,
         } => {
             let note = Note {
-                title: title.clone(),
+                title: match title {
+                    Some(title) => title.clone(),
+                    None => "Untitled".to_string(),
+                },
                 tags: tags.clone().unwrap_or_default(),
                 content: content.clone(),
             };
             insert_note(&connection, note)?;
         }
-        Commands::List {} => {
-            print_table(&connection)?;
-        }
+        Commands::List { tags } => match tags {
+            Some(tags) => {
+                let tags = tags.join(",");
+                let sql = format!("SELECT * FROM notes WHERE tags LIKE '%{}%'", tags);
+                let mut stmt = connection.prepare(&sql)?;
+                let notes = stmt.query_map([], db::parse_note)?;
+                for note in notes {
+                    println!("{}", note?);
+                    println!("--------------------")
+                }
+            }
+            None => {
+                print_table(&connection)?;
+            }
+        },
         Commands::View { title } => {
             match retrive_note(&connection, title) {
                 Some(note) => println!("{}", note),
@@ -36,6 +51,15 @@ fn main() -> Result<()> {
         }
         Commands::Delete { title } => {
             delete_note(&connection, title);
+        }
+        Commands::Edit { title, content } => {
+            let note = Note {
+                title: title.clone(),
+                tags: vec![],
+                content: content.clone(),
+            };
+            delete_note(&connection, title);
+            insert_note(&connection, note)?;
         }
     }
     Ok(())
