@@ -28,26 +28,27 @@ pub fn insert_note(connection: &Connection, note: Note) -> Result<usize, rusqlit
 #[allow(dead_code)]
 
 pub fn print_table(connection: &Connection) -> Result<(), rusqlite::Error> {
-    let sql = "SELECT * FROM notes;";
-
-    let mut stmt = match connection.prepare(sql) {
-        Ok(stmt) => stmt,
-        Err(_) => panic!("Error while preparing statement"),
-    };
-
-    let notes = match stmt.query_map([], parse_note) {
-        Ok(notes) => notes,
-        Err(_) => panic!("Error while fetching notes"),
-    };
+    let notes = get_all_notes(connection)?;
 
     for note in notes {
-        println!("{}", note?);
+        println!("{}", note);
         println!("--------------------")
     }
     Ok(())
 }
-#[allow(dead_code)]
 
+pub fn get_all_notes(connection: &Connection) -> Result<Vec<Note>, rusqlite::Error> {
+    let query = "SELECT * FROM notes";
+    let mut stmt = connection.prepare(query)?;
+    let notes = stmt
+        .query_map([], |row| parse_note(row))?
+        .filter_map(Result::ok)
+        .collect();
+
+    Ok(notes)
+}
+
+#[allow(dead_code)]
 pub fn delete_note(connection: &Connection, title: &String) {
     match connection.execute("DELETE FROM notes WHERE title = ?1", [title]) {
         Ok(0) => println!("Note not found"),
@@ -59,6 +60,7 @@ pub fn delete_note(connection: &Connection, title: &String) {
 
 pub fn parse_note(note: &rusqlite::Row) -> Result<Note> {
     Ok(Note {
+        id: note.get(0)?,
         title: note.get(1)?,
         content: note.get(2)?,
         tags: note
