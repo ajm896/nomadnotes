@@ -86,7 +86,7 @@ async fn graphql_handler(
 #[tokio::main]
 async fn main() {
     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription).finish();
-
+    #[allow(unused_variables)]
     let cors = CorsLayer::new()
         .allow_origin(Any) // Allow all origins (or restrict to specific ones)
         .allow_methods(Any) // Allow all HTTP methods
@@ -94,10 +94,10 @@ async fn main() {
 
     let app = Router::new()
         .route("/graphql", post(graphql_handler))
-        .layer(cors)
+        //.layer(cors)
         .layer(Extension(schema)); // Attach schema as a shared state
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 4000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 4000));
     println!("GraphQL API running at http://{}", addr);
 
     axum::Server::bind(&addr)
