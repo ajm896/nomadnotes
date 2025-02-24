@@ -11,6 +11,7 @@ use async_graphql::{Context, EmptySubscription, Object, Schema};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{routing::post, Router};
 use std::net::SocketAddr;
+use tower_http::cors::{Any, CorsLayer};
 
 struct QueryRoot;
 #[Object]
@@ -86,8 +87,14 @@ async fn graphql_handler(
 async fn main() {
     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription).finish();
 
+    let cors = CorsLayer::new()
+        .allow_origin(Any) // Allow all origins (or restrict to specific ones)
+        .allow_methods(Any) // Allow all HTTP methods
+        .allow_headers(Any); // Allow all headers
+
     let app = Router::new()
         .route("/graphql", post(graphql_handler))
+        .layer(cors)
         .layer(Extension(schema)); // Attach schema as a shared state
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 4000));
