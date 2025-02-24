@@ -3,7 +3,7 @@ use rusqlite::{Connection, Result};
 
 #[allow(dead_code)]
 pub fn init_db() -> Result<Connection> {
-    let connection = Connection::open("notes.db")?;
+    let connection = Connection::open("data/notes.db")?;
     connection.execute(
         "
             CREATE TABLE IF NOT EXISTS notes (

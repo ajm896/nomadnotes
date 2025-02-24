@@ -1,18 +1,20 @@
-mod cli;
 mod db;
 mod models;
-
-//use cli::{Cli, Commands};
 
 use crate::db::{delete_note, get_all_notes, init_db, insert_note, retrive_note};
 use crate::models::Note;
 
 use async_graphql::{Context, EmptySubscription, Object, Schema};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
+use axum::extract::State;
 use axum::{routing::post, Router};
 use std::net::SocketAddr;
+use tower_http::cors::CorsLayer;
 
 struct QueryRoot;
+struct MutationRoot;
+type AppSchema = Schema<QueryRoot, MutationRoot, EmptySubscription>;
+
 #[Object]
 impl QueryRoot {
     async fn get_notes(&self, _ctx: &Context<'_>) -> async_graphql::Result<Vec<Note>> {
@@ -22,7 +24,6 @@ impl QueryRoot {
     }
 }
 
-struct MutationRoot;
 #[Object]
 impl MutationRoot {
     async fn add_note(
@@ -73,28 +74,23 @@ impl MutationRoot {
     }
 }
 
-use axum::extract::Extension;
-
-async fn graphql_handler(
-    Extension(schema): Extension<Schema<QueryRoot, MutationRoot, EmptySubscription>>,
-    req: GraphQLRequest,
-) -> GraphQLResponse {
+async fn graphql_handler(schema: State<AppSchema>, req: GraphQLRequest) -> GraphQLResponse {
     schema.execute(req.into_inner()).await.into()
 }
 
 #[tokio::main]
 async fn main() {
-    let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription).finish();
+    let schema: AppSchema = Schema::build(QueryRoot, MutationRoot, EmptySubscription).finish();
 
     let app = Router::new()
-        .route("/graphql", post(graphql_handler))
-        .layer(Extension(schema)); // Attach schema as a shared state
+        .route("/graphql", post(graphql_handler).options(|| async { "OK" }))
+        //.route("/graphql", options(|| async { "OK" })) // Handle preflight requests
+        .with_state(schema)
+        .layer(CorsLayer::permissive());
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 4000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 4000));
     println!("GraphQL API running at http://{}", addr);
 
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:4000").await.unwrap();
+    axum::serve(listener, app).await.unwrap();
 }
