@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = { version = "4.5.30", features = ["derive"] }
 rusqlite = { version = "0.33.0", features = ["bundled"] }
-axum = "0.6"
 tokio = { version = "1", features = ["full"] }
-async-graphql = "5.0"
-async-graphql-axum = "5.0"
+async-graphql = "7.0.15"
+async-graphql-axum = "7.0.15"
 serde = { version = "1.0", features = ["derive"] }
 tower-http = { version = "0.6.2", features = ["cors"] }
+tower = "0.5.2"
+axum = "0.8.1"
