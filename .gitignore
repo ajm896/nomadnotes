@@ -1,5 +1,6 @@
 /target
 notes.db
+
 # Logs
 logs
 *.log
@@ -24,4 +25,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-nomadnotes-frontend/.vite/
+nomadnotes-frontend/node_modules
+nomadnotes-frontend/.vite
