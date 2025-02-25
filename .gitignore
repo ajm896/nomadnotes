@@ -1,2 +1,4 @@
 /target
 notes.db
+nomadnotes-frontend/node_modules
+nomadnotes-frontend/.vite
