@@ -7,6 +7,7 @@ use crate::models::Note;
 use async_graphql::{Context, EmptySubscription, Object, Schema};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::extract::State;
+use axum::routing::options;
 use axum::{routing::post, Router};
 use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
@@ -83,7 +84,8 @@ async fn main() {
     let schema: AppSchema = Schema::build(QueryRoot, MutationRoot, EmptySubscription).finish();
 
     let app = Router::new()
-        .route("/graphql", post(graphql_handler).options(|| async { "OK" }))
+        .route("/graphql", post(graphql_handler))
+        .route("/graphql", options(|| async { "OK" }))
         .with_state(schema)
         .layer(CorsLayer::very_permissive());
 
