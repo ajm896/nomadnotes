@@ -1,12 +1,8 @@
 import { useQuery } from "@apollo/client";
 import { GET_NOTES } from "./graphql/queries";
+import NotesList from "./components/NotesList"
 
-type Note = {
-  id: number;
-  title: string;
-  content: string;
-  tags: string[];
-};
+
 
 function App() {
   const { loading, error, data } = useQuery<{ getNotes: Note[] }>(GET_NOTES);
@@ -17,15 +13,7 @@ function App() {
   return (
     <div>
       <h1>Nomad Notes</h1>
-      {
-      data?.getNotes.map((note) => (
-        <div key={note.id} style={{ border: "1px solid #ddd", padding: "1em", margin: "1em" }}>
-          <h2>{note.title}</h2>
-          <p>{note.content}</p>
-          <p>Tags: {note.tags.join(", ")}</p>
-        </div>
-      ))
-      }
+      <NotesList notes={data?.getNotes} />
     </div>
   );
 }
