@@ -1,5 +1,8 @@
+import { SetStateAction } from "react";
+
 type CompProps = {
-    notes?: Note[]
+    notes?: Note[],
+    editSelect: React.Dispatch<SetStateAction<Note | null>> 
 }
 export default function ListNotes(props: CompProps) {
     return (
@@ -12,6 +15,8 @@ export default function ListNotes(props: CompProps) {
             <h2>{note.title}</h2>
             <p>{note.content}</p>
             <p>Tags: {note.tags.join(", ")}</p>
+            <button onClick={()=>props.editSelect(note)}>Edit</button>
+            <button>Delete</button>
           </div>
         ))}
       </div>

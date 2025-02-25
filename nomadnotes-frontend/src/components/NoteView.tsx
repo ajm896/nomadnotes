@@ -1,7 +1,7 @@
 type CompProps = {
   note?: Note;
 };
-export default function NotesList(props: CompProps) {
+export default function NoteView(props: CompProps) {
     const note: Note = props.note??{id: 0, title: "", content: "", tags: []};
     return (
       <div>
