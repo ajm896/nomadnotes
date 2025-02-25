@@ -84,7 +84,6 @@ async fn main() {
 
     let app = Router::new()
         .route("/graphql", post(graphql_handler).options(|| async { "OK" }))
-        //.route("/graphql", options(|| async { "OK" })) // Handle preflight requests
         .with_state(schema)
         .layer(CorsLayer::permissive());
 
