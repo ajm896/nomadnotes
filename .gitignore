@@ -27,3 +27,4 @@ dist-ssr
 *.sw?
 nomadnotes-frontend/node_modules/*
 nomadnotes-frontend/.vite/*
+nomadnotes-frontend/.vite/deps/_metadata.json
