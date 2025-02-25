@@ -85,7 +85,7 @@ async fn main() {
     let app = Router::new()
         .route("/graphql", post(graphql_handler).options(|| async { "OK" }))
         .with_state(schema)
-        .layer(CorsLayer::permissive());
+        .layer(CorsLayer::very_permissive());
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 4000));
     println!("GraphQL API running at http://{}", addr);
