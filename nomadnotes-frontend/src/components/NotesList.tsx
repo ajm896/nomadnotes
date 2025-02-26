@@ -1,4 +1,5 @@
 import { SetStateAction } from "react";
+import "./NotesList.css"; // Import the CSS file
 
 type CompProps = {
     notes?: Note[],
@@ -6,11 +7,11 @@ type CompProps = {
 }
 export default function ListNotes(props: CompProps) {
     return (
-      <div>
+      <div className="notes-grid">
         {props.notes?.map((note: Note) => (
           <div
             key={note.id}
-            style={{ border: "1px solid #ddd", padding: "1em", margin: "1em" }}
+            style={{ border: "1px solid #ddd", padding: "1em"}}
           >
             <h2>{note.title}</h2>
             <p>{note.content}</p>

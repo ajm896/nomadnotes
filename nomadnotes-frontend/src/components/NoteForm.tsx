@@ -1,24 +1,27 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import { ADD_NOTE, EDIT_NOTE } from "../graphql/mutations";
 import { GET_NOTES } from "../graphql/queries";
 
-type NoteFormProps = {
-  initialTitle?: string;
-  initialContent?: string;
-  initialTags?: string[];
-  isEditing?: boolean;
-};
+interface NoteFormProps {
+  initialTitle: string;
+  initialContent: string;
+  initialTags: string[];
+  isEditing: boolean;
+  onSave: () => void;
+}
 
-export default function NoteForm({
-  initialTitle = "",
-  initialContent = "",
-  initialTags = [],
-  isEditing = false,
-}: NoteFormProps) {
+const NoteForm: React.FC<NoteFormProps> = ({ initialTitle, initialContent, initialTags, isEditing, onSave }) => {
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
-  const [tags, setTags] = useState(initialTags.join(", "));
+  const [tags, setTags] = useState(initialTags);
+
+  useEffect(() => {
+    setTitle(initialTitle);
+    setContent(initialContent);
+    setTags(initialTags);
+  
+  }, [initialTitle, initialContent, initialTags]);
 
   const [addNote] = useMutation(ADD_NOTE, {
     refetchQueries: [{ query: GET_NOTES }], // Refresh notes list
@@ -30,7 +33,7 @@ export default function NoteForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const tagList = tags.split(",").map((tag) => tag.trim());
+    const tagList = tags?.map((tag) => tag.trim());
 
     if (isEditing) {
       await editNote({ variables: { title, content } });
@@ -40,7 +43,8 @@ export default function NoteForm({
 
     setTitle("");
     setContent("");
-    setTags("");
+    setTags([]);
+    onSave();
   };
 
   return (
@@ -67,8 +71,8 @@ export default function NoteForm({
         Tags (comma-separated):
         <input
           type="text"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
+          value={tags?.join(", ")}
+          onChange={(e) => setTags(e.target.value.split(", "))}
         />
       </label>
       <label>
@@ -82,4 +86,6 @@ export default function NoteForm({
       <button type="submit">{isEditing ? "Update Note" : "Add Note"}</button>
     </form>
   );
-}
+};
+
+export default NoteForm;

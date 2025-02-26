@@ -3,9 +3,6 @@ import { GET_NOTES } from "./graphql/queries";
 import NotesList from "./components/NotesList";
 import { useState } from "react";
 import NoteForm from "./components/NoteForm";
-//import {BrowserRouter} from "react-router"
-
-
 
 function App() {
   const { loading, error, data } = useQuery<{ getNotes: Note[] }>(GET_NOTES);
@@ -16,18 +13,17 @@ function App() {
   
   return (
     <div>
-      <h1>Nomad Notes</h1>
-      {editingNote ? (
-        <NoteForm
-          initialTitle={editingNote.title}
-          initialContent={editingNote.content}
-          initialTags={editingNote.tags}
-          isEditing
-        />
-      ) : (
-        <NoteForm />
-      )}
-      <NotesList notes={data?.getNotes} editSelect={setEditingNote}/>
+      <h1 className="text-3xl font-bold underline">Nomad Notes</h1>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <NoteForm
+            initialTitle={editingNote?.title || ""}
+            initialContent={editingNote?.content || ""}
+            initialTags={editingNote?.tags || []}
+            isEditing={!!editingNote}
+            onSave={() => setEditingNote(null)} // Reset editingNote after save
+          />
+          <NotesList notes={data?.getNotes} editSelect={setEditingNote} />
+        </div>
     </div>
   );
 }
