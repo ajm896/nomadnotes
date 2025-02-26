@@ -50,7 +50,7 @@ const NoteForm: React.FC<NoteFormProps> = ({ initialTitle, initialContent, initi
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-4 mt-4 border p-4 rounded-md shadow-md "
+      className="border-border bg-background flex flex-col gap-1 rounded-md border p-4 shadow-md text-text"
     >
       <label>
         Title:
@@ -59,7 +59,7 @@ const NoteForm: React.FC<NoteFormProps> = ({ initialTitle, initialContent, initi
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          className="border p-2 rounded-md"
+          className="border-border h-8 rounded-md border pl-2"
         />
       </label>
       <label>
@@ -68,7 +68,7 @@ const NoteForm: React.FC<NoteFormProps> = ({ initialTitle, initialContent, initi
           type="text"
           value={tags?.join(", ")}
           onChange={(e) => setTags(e.target.value.split(", "))}
-          className="border p-2 rounded-md"
+          className="border-border h-8 rounded-md border pl-2"
         />
       </label>
       <label>
@@ -77,10 +77,15 @@ const NoteForm: React.FC<NoteFormProps> = ({ initialTitle, initialContent, initi
           value={content}
           onChange={(e) => setContent(e.target.value)}
           required
-          className="border p-2 rounded-md w-full"
+          className="border-border h-100 w-full rounded-md border p-2"
         />
       </label>
-      <button className="bg-blue-500 text-white rounded-2xl" type="submit">{isEditing ? "Update Note" : "Add Note"}</button>
+      <button
+        className="bg-primary border-border justify-end rounded-2xl text-border"
+        type="submit"
+      >
+        {isEditing ? "Update Note" : "Add Note"}
+      </button>
     </form>
   );
 };

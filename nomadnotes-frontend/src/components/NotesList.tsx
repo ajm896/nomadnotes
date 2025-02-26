@@ -15,22 +15,24 @@ export default function ListNotes(props: CompProps) {
         {props.notes?.map((note: Note) => (
           <div
             key={note.id}
-            className="border p-4 rounded-md shadow-md hover:shadow-lg"
+            className="border p-4 rounded shadow-md flex flex-col gap-2 bg-background"
           >
             <h2>{note.title}</h2>
             <p>Tags: {note.tags.join(", ")}</p>
-            <span className="flex justify-end mt-4">
+            <span className="flex justify-end">
               <button
-                className="btn rounded-full bg-blue-200 text-white hover:bg-blue-400 min-w-20"
+                className="bg-primary border-border justify-end rounded-2xl text-border"
                 onClick={() => props.editSelect(note)}
               >
                 Edit
               </button>
-              <button onClick={() => {
-                const title = note.title;
-                  deleteNote({variables: {title}});
+              <button
+                onClick={() => {
+                  const title = note.title;
+                  deleteNote({ variables: { title } });
                 }}
-                      className="btn rounded-full shadow hover:bg-red-700 bg-red-500 text-white min-w-20">
+                className="shadow hover:bg-accent bg-error text-white"
+              >
                 Delete
               </button>
             </span>

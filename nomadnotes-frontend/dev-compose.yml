@@ -1,0 +1,19 @@
+services:
+  backend:
+    image: ghcr.io/ajm896/nomadnotes-backend
+    ports: 
+      - "4000:4000"
+    volumes:
+      - nomad-data:/app/data
+  frontend:
+    image: node:latest
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - mods:/app/node_modules
+    ports:
+      - "3000:5173"
+    command: npm run dev
+volumes:
+  nomad-data:
+  mods:
