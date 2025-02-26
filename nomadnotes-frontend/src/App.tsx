@@ -12,9 +12,9 @@ function App() {
   if (error) return <p>Error: {error.message}</p>;
   
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">Nomad Notes</h1>
-        <div style={{ display: "flex", flexDirection: "column" }}>
+    <div className="max-w-3xl mx-auto">
+      <h1 className="text-4xl font-bold text-center">Nomad Notes</h1>
+        <div className="container mx-auto p-4">
           <NoteForm
             initialTitle={editingNote?.title || ""}
             initialContent={editingNote?.content || ""}

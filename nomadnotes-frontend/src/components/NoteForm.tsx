@@ -50,13 +50,7 @@ const NoteForm: React.FC<NoteFormProps> = ({ initialTitle, initialContent, initi
   return (
     <form
       onSubmit={handleSubmit}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "1em",
-        padding: "1em",
-        border: "1px solid #ddd",
-      }}
+      className="flex flex-col gap-4 mt-4 border p-4 rounded-md shadow-md "
     >
       <label>
         Title:
@@ -65,6 +59,7 @@ const NoteForm: React.FC<NoteFormProps> = ({ initialTitle, initialContent, initi
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
+          className="border p-2 rounded-md"
         />
       </label>
       <label>
@@ -73,6 +68,7 @@ const NoteForm: React.FC<NoteFormProps> = ({ initialTitle, initialContent, initi
           type="text"
           value={tags?.join(", ")}
           onChange={(e) => setTags(e.target.value.split(", "))}
+          className="border p-2 rounded-md"
         />
       </label>
       <label>
@@ -81,9 +77,10 @@ const NoteForm: React.FC<NoteFormProps> = ({ initialTitle, initialContent, initi
           value={content}
           onChange={(e) => setContent(e.target.value)}
           required
+          className="border p-2 rounded-md w-full"
         />
       </label>
-      <button type="submit">{isEditing ? "Update Note" : "Add Note"}</button>
+      <button className="bg-blue-500 text-white rounded-2xl" type="submit">{isEditing ? "Update Note" : "Add Note"}</button>
     </form>
   );
 };
