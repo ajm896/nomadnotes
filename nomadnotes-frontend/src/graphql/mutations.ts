@@ -21,3 +21,9 @@ export const EDIT_NOTE = gql`
     }
   }
 `;
+
+export const DELETE_NOTE = gql`
+  mutation DeleteNote($title: String!) {
+    deleteNote(title: $title)
+  }
+`;

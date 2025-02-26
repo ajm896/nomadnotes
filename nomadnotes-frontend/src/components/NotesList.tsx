@@ -1,9 +1,15 @@
 import { SetStateAction } from "react";
+import { DELETE_NOTE } from "../graphql/mutations";
+import { useMutation } from "@apollo/client";
+import { GET_NOTES } from "../graphql/queries";
 type CompProps = {
     notes?: Note[],
     editSelect: React.Dispatch<SetStateAction<Note | null>> 
 }
 export default function ListNotes(props: CompProps) {
+  const [deleteNote] = useMutation(DELETE_NOTE, {
+    refetchQueries: [{ query: GET_NOTES }],
+  });
     return (
       <div className="grid grid-cols-3 gap-4 mt-4">
         {props.notes?.map((note: Note) => (
@@ -20,7 +26,11 @@ export default function ListNotes(props: CompProps) {
               >
                 Edit
               </button>
-              <button className="btn rounded-full shadow hover:bg-red-700 bg-red-500 text-white min-w-20">
+              <button onClick={() => {
+                const title = note.title;
+                  deleteNote({variables: {title}});
+                }}
+                      className="btn rounded-full shadow hover:bg-red-700 bg-red-500 text-white min-w-20">
                 Delete
               </button>
             </span>
